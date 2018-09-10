@@ -1,6 +1,6 @@
 ---
 title: "project"
-author: "Weijia Chen"
+author: "Weijia Chen, Chen Zhong"
 date: "2018/4/29"
 output: html_document
 ---
