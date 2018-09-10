@@ -1,0 +1,35 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+btc1 = read.csv("xrp1106_1204.csv")
+btc2 = read.csv("xrp1204_0101.csv")
+btc3 = read.csv("xrp0101_0129.csv")
+```
+
+
+```{r}
+library(xts)
+```
+
+```{r}
+btc1_xts = xts(btc1[,-1], order.by=as.POSIXct(btc1$timestamp))
+btc2_xts = xts(btc2[,-1], order.by=as.POSIXct(btc2$timestamp))
+btc3_xts = xts(btc3[,-1], order.by=as.POSIXct(btc3$timestamp))
+storage.mode(btc1_xts) <- "numeric"
+storage.mode(btc2_xts) <- "numeric"
+storage.mode(btc3_xts) <- "numeric"
+```
+```{r}
+btc1_min = to.minutes(btc1_xts[,2])
+btc2_min = to.minutes(btc2_xts[,2])
+btc3_min = to.minutes(btc3_xts[,2])
+btc = rbind.xts(btc1_min,btc2_min,btc3_min)
+```
+```{r}
+save(btc,file = "xrp1106_0129.RData")
+```
+
+

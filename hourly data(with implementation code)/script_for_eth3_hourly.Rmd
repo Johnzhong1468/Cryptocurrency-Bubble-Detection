@@ -1,0 +1,53 @@
+---
+title: "project"
+author: "Weijia Chen"
+date: "2018/4/29"
+output: html_document
+---
+
+## Bitcoin data
+
+### Bitcoin Hourly
+
+```{r setup, include=FALSE, warning=TRUE}
+require(yuima)
+filename <- 'Gdax_ETHUSD_1h.csv'
+outputfile <- file('output_hourly11','a')
+X <- read.csv(filename,header=TRUE)
+#prices <- eth3$`eth1[, 2].Close`#
+prices = X$Close
+
+  # write('\n',outputfile)
+  # write(toString(paste0("Estimates for ",cryptonames[i])), outputfile)
+j = 1
+
+mod <- setModel(drift="alpha+beta*x", diffusion=matrix("sigma*x^gamma",1,1))
+yuima <- setYuima(data=setData(as.numeric(prices)), model=mod)
+lambda0 <- list(alpha=10, beta =10, sigma =10, gamma =10)
+start <- list(alpha=1, beta =-.1, sigma =.1, gamma =1)
+low <- list(alpha=-5, beta =-5, sigma =-5, gamma =-5)
+upp <- list(alpha=8, beta =8, sigma =8, gamma =8)
+
+lasso10 <- lasso(yuima, lambda0, start=start, lower=low, upper=upp, delta=0.5, method="L-BFGS-B")
+
+round(lasso10$mle, 3)
+# gamma value and its std
+write(paste(toString(lasso10$mle[2]),toString(lasso10$sd.mle[2])), outputfile,append=TRUE)
+# magnitude of |alpha|+|beta|+|gamma|+|sigma|
+# u <- abs(lasso10$mle[1])+abs(lasso10$mle[2])+abs(lasso10$mle[3])+abs(lasso10$mle[4])
+# write(u, outputfile,append=TRUE)
+
+# qmle + mild lasso 
+round(lasso10$lasso, 3)
+write(paste(toString(lasso10$lasso[2]),toString(lasso10$sd.lasso[2])), outputfile,append=TRUE)
+# u <- abs(lasso10$lasso[1])+abs(lasso10$lasso[2])+abs(lasso10$lasso[3])+abs(lasso10$lasso[4])
+# write(u, outputfile,append=TRUE)
+
+# qmle + strong lasso
+lasso20 <- lasso(yuima, lambda0, start=start, lower=low, upper=upp, delta=1, method="L-BFGS-B")
+round(lasso20$lasso, 3)
+write(paste(toString(lasso20$lasso[2]),toString(lasso20$sd.lasso[2])), outputfile,append=TRUE)
+# u <- abs(lasso20$lasso[1])+abs(lasso20$lasso[2])+abs(lasso20$lasso[3])+abs(lasso20$lasso[4])
+# write(u, outputfile,append=TRUE)
+
+```
